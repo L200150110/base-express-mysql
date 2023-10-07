@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/users", getUsers);
 router.post("/users", addUser);
-// router.get("/users", getUsers);
+// router.put("/users", editUsers);
 // router.get("/users", getUsers);
 
 export default router;
