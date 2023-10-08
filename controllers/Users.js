@@ -36,7 +36,7 @@ export const addUser = async (req, res) => {
       }
     } catch (err) {
       console.log(err);
-      res.status(500).json(err.message);
+      res.status(500).json({ message: err.message });
     }
   }
 };
@@ -55,8 +55,19 @@ export const loginUser = async (req, res) => {
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "20s" }
       );
+      const refreshToken = jwt.sign(
+        { id, name, email },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+      await Users.update({ refresh_token: refreshToken }, { where: { id } });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.json({ accessToken });
     }
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json({ message: "email does not match" });
   }
 };
