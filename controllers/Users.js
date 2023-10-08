@@ -21,12 +21,19 @@ export const addUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     try {
-      const users = await Users.create({
-        name,
-        email,
-        password: hashedPassword,
+      const exist = await Users.findAll({
+        where: { email: req.body.email },
       });
-      res.json({ message: "create success" });
+      if (exist.length > 0) {
+        res.status(400).json({ message: "email already exist" });
+      } else {
+        const user = await Users.create({
+          name,
+          email,
+          password: hashedPassword,
+        });
+        res.json({ message: "create success", data: user });
+      }
     } catch (err) {
       console.log(err);
       res.status(500).json(err.message);
